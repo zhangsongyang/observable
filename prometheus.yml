@@ -8,16 +8,20 @@ scrape_configs:
       - targets: ['alloy:9464']
 
   # 抓 Loki 自身的 metrics
-#  - job_name: 'loki'
-#    static_configs:
-#      - targets: ['loki:3100']
+  - job_name: 'loki'
+    static_configs:
+      - targets: ['loki:3100']
 
   # 抓 Tempo 自身的 metrics
-#  - job_name: 'tempo'
-#    static_configs:
-#      - targets: ['tempo:3200']
+  - job_name: 'tempo'
+    static_configs:
+      - targets: ['tempo:3200']
 
   # 抓 Prometheus 自己的 metrics
-#  - job_name: 'prometheus'
-#    static_configs:
-#      - targets: ['prometheus:9090']
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['prometheus:9090']
+
+  - job_name: 'pyroscope'
+    static_configs:
+      - targets: [ 'pyroscope:4040' ]

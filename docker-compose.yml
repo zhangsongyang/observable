@@ -32,6 +32,11 @@ services:
     ports:
       - "9090:9090"
 
+  pyroscope:
+    image: grafana/pyroscope:latest
+    ports:
+      - "4040:4040"
+
   # Alloy (做 collector/agent)
   alloy:
     image: grafana/alloy:v1.10.1
@@ -47,9 +52,11 @@ services:
       - "9464:9464"     # Prometheus metrics 暴露端口
       - "4318:4318"     # OTLP HTTP
       - "4319:4319"     # OTLP gRPC（新增）
+      - "9999:9999"
     depends_on:
       - loki
       - tempo
+      - pyroscope
       - prometheus
 
   # Grafana
@@ -63,6 +70,7 @@ services:
     depends_on:
       - loki
       - tempo
+      - pyroscope
       - prometheus
 
 networks:
