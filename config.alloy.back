@@ -1,0 +1,74 @@
+#########################
+# Optional: livedebugging for Alloy UI
+#########################
+livedebugging {
+  enabled = true
+}
+
+
+#########################
+# OTLP receiver (traces/metrics/logs)
+#########################
+otelcol.receiver.otlp "otlp_receiver" {
+  grpc {
+    endpoint = "0.0.0.0:4319"
+  }
+  http {
+    endpoint = "0.0.0.0:4318"
+  }
+
+  output {
+    traces  = [otelcol.processor.batch_traces.input]
+    metrics = [otelcol.processor.batch_metrics.input]
+    logs    = [otelcol.processor.batch_logs.input]
+  }
+}
+
+#########################
+# Batch processors
+#########################
+otelcol.processor.batch "batch_traces" {
+  output {
+    traces = [otelcol.exporter.otlp_to_tempo.input]
+  }
+}
+
+otelcol.processor.batch "batch_metrics" {
+  output {
+    metrics = [otelcol.exporter.prometheus.input]  # 链路：metrics -> Prometheus exporter
+  }
+}
+
+otelcol.processor.batch "batch_logs" {
+  output {
+    logs = [loki.write.getting_started.input] # logs -> Loki via loki.write component
+  }
+}
+
+#########################
+# Export traces -> Tempo (OTLP exporter)
+#########################
+otelcol.exporter.otlp "otlp_to_tempo" {
+  client {
+    endpoint = "tempo:4317"
+    tls {
+      insecure = true
+    }
+  }
+}
+
+#########################
+# Export metrics -> Prometheus
+#########################
+otelcol.exporter.prometheus "prometheus" {
+  endpoint = "0.0.0.0:9464"
+  metric_prefix = "alloy_"
+}
+
+loki.write "getting_started" {
+	endpoint {
+		url  = "http://loki:3100/loki/api/v1/push"
+	}
+}
+
+
